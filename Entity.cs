@@ -18,7 +18,9 @@ namespace RamilH.ECS
 		private bool enabled; //If Entity is in an active state
 
 		public string Id { get; set; }	//Unique Name
-		private List<Component> components;
+		public List<Component> components = new List<Component>();
+
+		protected Entity() { }
 
 
 		public Entity(string Id)
@@ -29,23 +31,36 @@ namespace RamilH.ECS
 		}
 
 		//Generic with contraints to IComponent
-		public Component GetComponent<T>() where T : Component
+		public T GetComponent<T>() where T : Component
 		{
 			var component = components.OfType<T>().FirstOrDefault();
 
-			if (component == null) 
-				throw new Exception("This Component does not on this Entity!");
+			//if (component == null) 
+				//throw new Exception("This Component does not on this Entity!");
 
 			return component;
 		}
 
-
 		public void AddComponent<T>() where T : Component, new()
 		{
-			if (HasComponent<T>() == false)
+			if (HasComponent<T>() == true)
 				throw new Exception("This Component already Exists on this Entity!");
-			
-			components.Add(new T() );
+
+			var component = new T();
+			components.Add(component);
+		}
+
+		public T AddGetComponent<T>() where T : Component, new()
+		{
+			if (HasComponent<T>() == true)
+				throw new Exception("This Component already Exists on this Entity!");
+
+			var component = new T();
+			components.Add(component);
+
+			//return GetComponent<T>();
+
+			return component;
 		}
 
 		public void RemoveComponent<T>() where T : Component
@@ -58,7 +73,8 @@ namespace RamilH.ECS
 		}
 
 		public bool HasComponent<T>()  where T : Component
-		{ 
+		{
+			//if (components.Count == 0) return false;
 			//If there exist a component that with type T then return true
 			var component = components.Any(c => c.GetType() == typeof(T));
 			return (component) ? true : false;
